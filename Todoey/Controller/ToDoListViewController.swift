@@ -7,13 +7,17 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController {
     
-    var itemArray = [item]()
+    var itemArray = [Item]()
     
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
+
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
     
-    let defaults = UserDefaults.standard
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,35 +28,24 @@ class ToDoListViewController: UITableViewController {
         appendItems(items: "Mazad")
         appendItems(items: "Mazad")
         appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
-        appendItems(items: "Mazad")
+        
 
+       
         
         
         
-        
-        
-        if let items = defaults.array(forKey: "ToDoListArray") as? [item]{
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "ToDoListArray") as? [item]{
+//            itemArray = items
+//        }
         
         
     }
     
     //MART - Function used to append new itme to the array
     func appendItems(items : String) -> Void {
-        let newItem = item()
+        let newItem = Item(context: context)
         newItem.title = items
+        newItem.done = false
         itemArray.append(newItem)
     }
 
@@ -83,7 +76,7 @@ class ToDoListViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
-    
+        saveItems()
         
         tableView.reloadData()
         
@@ -98,15 +91,17 @@ class ToDoListViewController: UITableViewController {
         
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         
+        
+        
+        
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // "what will be after user clicks the Add Item button on our Alert"
             
             
+            
             self.appendItems(items: textField.text!)
             
-            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
-            
-            self.tableView.reloadData()
+            self.saveItems()
             
             
         }
@@ -121,6 +116,30 @@ class ToDoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
         
     }
+    
+    func saveItems(){
+        
+        
+        
+        do{
+            try context.save()
+        }catch{
+            print("error save is \(error)")
+        }
+        
+        self.tableView.reloadData()
+    }
+    
+//    func loadItems(){
+//        if let data = try? Data(contentsOf: dataFilePath!){
+//
+//
+//            do{
+//            }catch{
+//            }
+//        }
+//    }
+    
     
 }
 
